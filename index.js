@@ -9,7 +9,8 @@
     content = _.concat(content).join('');
     return `<${name}${atts}>${content}</${name}>`;
   }
-  const [table, tr, th, td] = ['table', 'tr', 'th', 'td'].map(element);
+  const [table, thead, tbody, tr, th, td] = 
+    ['table', 'thead', 'tbody', 'tr', 'th', 'td'].map(element);
 
   class Owner {
     constructor({ id, type, schedule = [] }) {
@@ -83,7 +84,7 @@
     }
 
     taskTable() {
-      const header = tr(['Task ID', 'Description', 'Est Days', 'Owner', 'Est Start', 'Est End'].map(th));
+      const header = thead(tr(['Task ID', 'Description', 'Est Days', 'Owner', 'Est Start', 'Est End'].map(th)));
       const rows = _.values(this.tasks).map(task => tr([
         td(this.formatTaskId(task.id)),
         td(_.escape(task.desc) || ''),
@@ -92,13 +93,14 @@
         td(this.daysToDate(task.start)),
         td(this.daysToDate(task.end)),
       ]));
-      return table([header, ...rows], { class: 'tasks' });
+      return table([header, tbody(rows)], { class: 'tasks' });
     }
 
     ownerTable() {
       const end = this.end();
       const owners = _.values(this.owners);
-      const rows = [tr([th('Date')].concat(owners.map(owner => th(owner.id))))];
+      const header = thead(tr([th('Date')].concat(owners.map(owner => th(owner.id)))));
+      const rows = [];
 
       for (const owner of owners) {
         owner.newSchedule = [...owner.schedule];
@@ -118,7 +120,7 @@
         rows.push(tr(cols));
       }
 
-      return table(rows, { class: 'owners' });
+      return table([header, tbody(rows)], { class: 'owners' });
     }
   }
 
