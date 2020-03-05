@@ -99,8 +99,9 @@
       const rows = [];
 
       for (const owner of owners) {
-        owner.newSchedule = [...owner.schedule];
-        const ownerEnd = _.last(owner.schedule).end;
+        const schedule = owner.newSchedule = [...owner.schedule];
+        const lastWork = _.last(schedule);
+        const ownerEnd = lastWork ? lastWork.end : 0;
         if (ownerEnd < end) owner.newSchedule.push({ start: ownerEnd, end });
       }
 
