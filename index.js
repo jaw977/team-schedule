@@ -20,23 +20,21 @@
     }
 
     addTask({start = 0, id = '', desc = '', est = 1}) {
-      this.newSchedule = [...this.schedule];
-      this.start = null;
+      const schedule = this.newSchedule = [...this.schedule];
       if (_.isObject(est)) est = est[this.id] || est[this.type] || 1;
-      this.est = est;
+      const task = this.task = { est };
       for (let i = 0; est > 0; i++) {
-        const work = this.newSchedule[i] || { start: start + est };
+        const work = schedule[i] || { start: start + est };
         const avail = work.start - start;
         if (avail > 0) {
           const duration = Math.min(est, avail);
-          if (_.isNull(this.start)) this.start = start;
-          this.end = start + duration;
-          this.newSchedule.splice(i, 0, { id, desc, start, end: this.end });
+          if (! _.has(task, 'start')) task.start = start;
+          task.end = start + duration;
+          schedule.splice(i, 0, { id, desc, start, end: task.end });
           est -= duration;
         }
         start = Math.max(work.end, start);
       }
-      return this;
     }
 
     confirmTask() {
@@ -60,13 +58,11 @@
         const owners = task.own ? _.concat(task.own).map(id => this.owners[id]) : _.values(this.owners);
         if (task.dep) task.start = this.tasks[task.dep].end;
         for (const owner of owners) owner.addTask(task);
-        const owner = _.sortBy(owners, 'end')[0];
+        const owner = _.sortBy(owners, 'task.end')[0];
         owner.confirmTask();
         if (! task.id) continue;
         task.own = owner.id;
-        task.start = owner.start;
-        task.end = owner.end;
-        task.est = owner.est;
+        _.assign(task, owner.task);
         this.tasks[task.id] = task;
       }
     }
