@@ -86,7 +86,7 @@
         td(_.escape(task.desc) || ''),
         td(task.est.toFixed(1), { class: 'estDays' }),
         td(task.own, { class: 'ownerId' }),
-        td(this.daysToDate(task.start)),
+        td(this.daysToDate(task.start - .5)),
         td(this.daysToDate(task.end - 1)),
       ]));
       return table([header, tbody(rows)], { class: 'tasks' });
